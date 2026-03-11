@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking #{{ booking.pk }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="detail-grid">
+      <!-- Main -->
+      <div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <div class="flex items-center justify-between">
+              <h2 style="font-size:1.3rem;">Booking #{{ booking.pk }}</h2>
+              <span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="detail-row">
+              <span class="detail-label">Service</span>
+              <span class="detail-value">{{ booking.service.name|default:"—" }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Vendor</span>
+              <span class="detail-value">
+                <a href="{% url 'vendor_detail' booking.vendor.pk %}">{{ booking.vendor.business_name }}</a>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Customer</span>
+              <span class="detail-value">{{ booking.customer.get_full_name|default:booking.customer.username }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Scheduled</span>
+              <span class="detail-value">{{ booking.scheduled_date|date:"M d, Y" }} at {{ booking.scheduled_time|time:"h:i A" }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Address</span>
+              <span class="detail-value">{{ booking.address|default:"—" }}</span>
+            </div>
+            <div class="detail-row" style="border:none;">
+              <span class="detail-label">Created</span>
+              <span class="detail-value">{{ booking.created_at|date:"M d, Y h:i A" }}</span>
+            </div>
+
+            {% if booking.description %}
+            <div class="mt-3">
+              <h3 style="font-size:1rem;margin-bottom:8px;">Issue Description</h3>
+              <p class="card-text">{{ booking.description }}</p>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if user.role == 'vendor' and booking.vendor.user == user %}
+          <div class="card-footer" style="flex-wrap:wrap;">
+            {% if booking.status == 'pending' %}
+              <a href="{% url 'booking_update_status' booking.pk 'accepted' %}" class="btn btn-success btn-sm">
+                <i class="fas fa-check"></i> Accept
+              </a>
+              <a href="{% url 'booking_update_status' booking.pk 'cancelled' %}" class="btn btn-danger btn-sm">
+                <i class="fas fa-times"></i> Decline
+              </a>
+            {% elif booking.status == 'accepted' %}
+              <a href="{% url 'booking_update_status' booking.pk 'in_progress' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-play"></i> Start Work
+              </a>
+            {% elif booking.status == 'in_progress' %}
+              <a href="{% url 'booking_update_status' booking.pk 'completed' %}" class="btn btn-success btn-sm">
+                <i class="fas fa-check-double"></i> Mark Complete
+              </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Review section -->
+        {% if booking.review %}
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size:1.1rem;"><i class="fas fa-star" style="color:var(--accent-warning);"></i> Review</h3>
+          </div>
+          <div class="card-body">
+            <div class="flex items-center gap-1 mb-1">
+              <div class="stars">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= booking.review.rating %}
+                    <i class="fas fa-star"></i>
+                  {% else %}
+                    <i class="fas fa-star empty"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <span class="rating-value">{{ booking.review.rating }}/5</span>
+            </div>
+            {% if booking.review.comment %}
+            <p class="card-text">{{ booking.review.comment }}</p>
+            {% endif %}
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-top:8px;">{{ booking.review.created_at|date:"M d, Y" }}</p>
+          </div>
+        </div>
+        {% elif review_form %}
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size:1.1rem;"><i class="fas fa-pen" style="color:var(--accent-primary);"></i> Leave a Review</h3>
+          </div>
+          <div class="card-body">
+            <form method="post" action="{% url 'review_create' booking.pk %}">
+              {% csrf_token %}
+              {% for field in review_form %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+              </div>
+              {% endfor %}
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Submit Review
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size:1rem;">Quick Actions</h3>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
+            <a href="{% url 'booking_list' %}" class="btn btn-secondary btn-block">
+              <i class="fas fa-list"></i> All Bookings
+            </a>
+            <a href="{% url 'vendor_detail' booking.vendor.pk %}" class="btn btn-secondary btn-block">
+              <i class="fas fa-user"></i> Vendor Profile
+            </a>
+            {% if user.role == 'customer' and booking.status == 'pending' %}
+            <a href="{% url 'video_consultation' booking.vendor.pk %}" class="btn btn-primary btn-block">
+              <i class="fas fa-video"></i> Video Consult
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

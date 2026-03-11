@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Register as {{ user_type }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="form-card" style="max-width:640px;">
+      <h2>
+        {% if user_type == 'Vendor' %}
+          <i class="fas fa-tools" style="color:var(--accent-tertiary);"></i> Join as a Vendor
+        {% else %}
+          <i class="fas fa-user-plus" style="color:var(--accent-primary);"></i> Create Account
+        {% endif %}
+      </h2>
+      <p class="subtitle">
+        {% if user_type == 'Vendor' %}
+          Register your services and start receiving bookings
+        {% else %}
+          Sign up to find and book home service professionals
+        {% endif %}
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+          <p class="form-help">{{ field.help_text }}</p>
+          {% endif %}
+          {% if field.errors %}
+          <ul class="errorlist">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg mt-2">
+          <i class="fas fa-rocket"></i> Create {{ user_type }} Account
+        </button>
+      </form>
+
+      <div class="text-center mt-3">
+        <p style="color:var(--text-secondary);">
+          Already have an account? <a href="{% url 'login' %}">Log in</a>
+        </p>
+        {% if user_type == 'Customer' %}
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">
+          Are you a service provider? <a href="{% url 'register_vendor' %}">Register as Vendor</a>
+        </p>
+        {% else %}
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">
+          Looking for services? <a href="{% url 'register_customer' %}">Sign up as Customer</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

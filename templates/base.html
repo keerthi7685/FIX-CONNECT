@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Consult — The all-in-one platform to discover, consult, and book home service professionals.">
+  <title>{% block title %}Fixconnect{% endblock %} — Home Services Platform</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="{% url 'home' %}" class="navbar-brand">
+        <i class="fas fa-bolt"></i> Fixconnect
+      </a>
+
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <ul class="navbar-links">
+        <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+        <li><a href="{% url 'service_list' %}" class="{% if request.resolver_match.url_name == 'service_list' %}active{% endif %}">Services</a></li>
+        <li><a href="{% url 'vendor_list' %}" class="{% if request.resolver_match.url_name == 'vendor_list' %}active{% endif %}">Vendors</a></li>
+        <li><a href="{% url 'brand_list' %}" class="{% if request.resolver_match.url_name == 'brand_list' %}active{% endif %}">Brands</a></li>
+
+        {% if user.is_authenticated %}
+          {% if user.role == 'customer' %}
+            <li><a href="{% url 'appliance_list' %}"><i class="fas fa-box"></i> My Appliances</a></li>
+            <li><a href="{% url 'booking_list' %}"><i class="fas fa-calendar"></i> Bookings</a></li>
+          {% elif user.role == 'vendor' %}
+            <li><a href="{% url 'vendor_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+          {% elif user.role == 'admin' %}
+            <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-shield-alt"></i> Admin</a></li>
+          {% endif %}
+
+          <li class="nav-auth">
+            <span style="color:var(--text-muted);font-size:0.85rem;">
+              <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
+            </span>
+            <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-auth">
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">Login</a>
+            <a href="{% url 'register_customer' %}" class="btn btn-primary btn-sm">Sign Up</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">
+      <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand"><i class="fas fa-bolt"></i> Consult</div>
+          <p class="footer-about">
+            The all-in-one platform to discover, consult, and book home service professionals.
+            Find trusted technicians, contact brand centers, and maintain your home with ease.
+          </p>
+        </div>
+        <div>
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'service_list' %}">Services</a></li>
+            <li><a href="{% url 'vendor_list' %}">Find Vendors</a></li>
+            <li><a href="{% url 'brand_list' %}">Brand Centers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'register_customer' %}">Register</a></li>
+            <li><a href="{% url 'register_vendor' %}">Become a Vendor</a></li>
+            <li><a href="{% url 'login' %}">Login</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul class="footer-links">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Consult. All rights reserved. Built with <i class="fas fa-heart" style="color:var(--accent-danger);"></i>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

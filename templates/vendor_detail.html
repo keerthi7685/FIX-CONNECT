@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ vendor.business_name }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="detail-grid">
+      <!-- Main Content -->
+      <div>
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="vendor-avatar" style="width:80px;height:80px;font-size:2rem;margin-bottom:0;">
+                {{ vendor.user.first_name|first|default:"V" }}
+              </div>
+              <div>
+                <h1 style="font-size:1.6rem;margin-bottom:4px;">{{ vendor.business_name }}</h1>
+                <div class="flex items-center gap-2 flex-wrap">
+                  {% if vendor.is_verified %}
+                  <span class="badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                  {% endif %}
+                  {% if vendor.is_available %}
+                  <span class="badge badge-completed"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Available</span>
+                  {% else %}
+                  <span class="badge badge-cancelled"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Unavailable</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1 mb-2">
+              <div class="stars">
+                {% with rating=vendor.average_rating %}
+                {% for i in "12345" %}
+                  {% if forloop.counter <= rating %}
+                    <i class="fas fa-star"></i>
+                  {% else %}
+                    <i class="fas fa-star empty"></i>
+                  {% endif %}
+                {% endfor %}
+                {% endwith %}
+              </div>
+              <span class="rating-value">{{ vendor.average_rating }}</span>
+              <span style="color:var(--text-muted);font-size:0.85rem;">({{ vendor.total_reviews }} reviews)</span>
+            </div>
+
+            {% if vendor.description %}
+            <p class="card-text mb-3">{{ vendor.description }}</p>
+            {% endif %}
+
+            <div class="vendor-meta mb-2">
+              <span><i class="fas fa-map-marker-alt"></i> {{ vendor.user.city|default:"—" }}{% if vendor.user.area %}, {{ vendor.user.area }}{% endif %}</span>
+              <span><i class="fas fa-phone"></i> {{ vendor.user.phone|default:"—" }}</span>
+              <span><i class="fas fa-briefcase"></i> {{ vendor.experience_years }} years experience</span>
+              <span><i class="fas fa-rupee-sign"></i> ₹{{ vendor.hourly_rate }}/hr</span>
+              <span><i class="fas fa-clipboard-check"></i> {{ vendor.completed_bookings }} jobs completed</span>
+            </div>
+
+            <h3 style="font-size:1rem;margin-top:20px;margin-bottom:12px;">Services Offered</h3>
+            <div class="vendor-services">
+              {% for svc in vendor.services.all %}
+              <span class="tag">{{ svc.name }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% if user.is_authenticated and user.role == 'customer' %}
+          <div class="card-footer">
+            <a href="{% url 'booking_create' vendor.pk %}" class="btn btn-success" style="flex:1;">
+              <i class="fas fa-calendar-plus"></i> Book Service
+            </a>
+            <a href="{% url 'video_consultation' vendor.pk %}" class="btn btn-primary">
+              <i class="fas fa-video"></i> Video Consult
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Reviews -->
+        <div class="card">
+          <div class="card-header">
+            <h3 style="font-size:1.1rem;"><i class="fas fa-star" style="color:var(--accent-warning);"></i> Reviews ({{ vendor.total_reviews }})</h3>
+          </div>
+          <div class="card-body">
+            {% if reviews %}
+              {% for review in reviews %}
+              <div class="review-item">
+                <div class="review-header">
+                  <div>
+                    <span class="review-author">{{ review.booking.customer.get_full_name|default:review.booking.customer.username }}</span>
+                    <div class="stars" style="margin-top:4px;">
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                          <i class="fas fa-star"></i>
+                        {% else %}
+                          <i class="fas fa-star empty"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                </div>
+                {% if review.comment %}
+                <p class="card-text mt-1">{{ review.comment }}</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state" style="padding:24px;">
+                <i class="fas fa-comment-slash"></i>
+                <p>No reviews yet</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 style="font-size:1rem;">Quick Info</h3>
+          </div>
+          <div class="card-body">
+            <div class="detail-row">
+              <span class="detail-label">Rating</span>
+              <span class="detail-value">{{ vendor.average_rating }} / 5</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Experience</span>
+              <span class="detail-value">{{ vendor.experience_years }} years</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Rate</span>
+              <span class="detail-value">₹{{ vendor.hourly_rate }}/hr</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Jobs Done</span>
+              <span class="detail-value">{{ vendor.completed_bookings }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Location</span>
+              <span class="detail-value">{{ vendor.user.city|default:"—" }}</span>
+            </div>
+            <div class="detail-row" style="border:none;">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">
+                {% if vendor.is_available %}
+                <span class="badge badge-completed">Available</span>
+                {% else %}
+                <span class="badge badge-cancelled">Unavailable</span>
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {% if not user.is_authenticated %}
+        <div class="card">
+          <div class="card-body text-center">
+            <p style="color:var(--text-secondary);margin-bottom:16px;">Sign in to book services or start a video consultation</p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-block">Log In</a>
+            <a href="{% url 'register_customer' %}" class="btn btn-secondary btn-block mt-1">Create Account</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="page-header">
+      <h1><i class="fas fa-calendar-alt" style="color:var(--accent-primary);"></i> {% if user.role == 'vendor' %}Service Requests{% else %}My Bookings{% endif %}</h1>
+    </div>
+
+    {% if bookings %}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>{% if user.role == 'vendor' %}Customer{% else %}Vendor{% endif %}</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.pk }}</td>
+            <td>
+              {% if user.role == 'vendor' %}
+                {{ booking.customer.get_full_name|default:booking.customer.username }}
+              {% else %}
+                {{ booking.vendor.business_name }}
+              {% endif %}
+            </td>
+            <td>{{ booking.service.name|default:"—" }}</td>
+            <td>{{ booking.scheduled_date|date:"M d, Y" }} at {{ booking.scheduled_time|time:"h:i A" }}</td>
+            <td><span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+            <td>
+              <a href="{% url 'booking_detail' booking.pk %}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-calendar-times"></i>
+      <h3>No bookings yet</h3>
+      <p>{% if user.role == 'vendor' %}You haven't received any bookings yet{% else %}Browse vendors and book your first service{% endif %}</p>
+      {% if user.role == 'customer' %}
+      <a href="{% url 'vendor_list' %}" class="btn btn-primary mt-2">
+        <i class="fas fa-search"></i> Find Vendors
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

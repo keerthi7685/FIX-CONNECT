@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="dashboard-header">
+      <h1><i class="fas fa-shield-alt" style="color:var(--accent-secondary);"></i> Admin Dashboard</h1>
+      <p>Platform overview and management</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number">{{ total_customers }}</div>
+        <div class="stat-label">Customers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ total_vendors }}</div>
+        <div class="stat-label">Vendors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ total_bookings }}</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ pending_bookings }}</div>
+        <div class="stat-label">Pending Bookings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ categories.count }}</div>
+        <div class="stat-label">Service Categories</div>
+      </div>
+    </div>
+
+    <div class="flex gap-1 mb-3">
+      <a href="{% url 'admin_manage_users' %}" class="btn btn-secondary">
+        <i class="fas fa-users"></i> Manage Users
+      </a>
+      <a href="/admin/" class="btn btn-secondary">
+        <i class="fas fa-cog"></i> Django Admin
+      </a>
+    </div>
+
+    <!-- Unverified Vendors -->
+    {% if unverified_vendors %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 style="font-size:1.1rem;">
+          <i class="fas fa-user-clock" style="color:var(--accent-warning);"></i> Unverified Vendors ({{ unverified_vendors.count }})
+        </h3>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper" style="border:none;border-radius:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Owner</th>
+                <th>City</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for vendor in unverified_vendors %}
+              <tr>
+                <td>{{ vendor.business_name }}</td>
+                <td>{{ vendor.user.get_full_name|default:vendor.user.username }}</td>
+                <td>{{ vendor.user.city|default:"—" }}</td>
+                <td>{{ vendor.created_at|date:"M d, Y" }}</td>
+                <td>
+                  <a href="{% url 'admin_verify_vendor' vendor.pk %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-check"></i> Verify
+                  </a>
+                  <a href="{% url 'vendor_detail' vendor.pk %}" class="btn btn-secondary btn-sm">View</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Service Categories -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 style="font-size:1.1rem;"><i class="fas fa-tags" style="color:var(--accent-tertiary);"></i> Service Categories</h3>
+      </div>
+      <div class="card-body">
+        <div class="vendor-services">
+          {% for cat in categories %}
+          <span class="tag" style="padding:6px 14px;font-size:0.85rem;">
+            <i class="{{ cat.icon }}"></i> {{ cat.name }} ({{ cat.vendors.count }})
+          </span>
+          {% endfor %}
+        </div>
+        <p class="form-help mt-2">
+          <i class="fas fa-info-circle"></i> Manage categories through the <a href="/admin/service/servicecategory/">Django Admin</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="card">
+      <div class="card-header">
+        <h3 style="font-size:1.1rem;"><i class="fas fa-history" style="color:var(--text-muted);"></i> Recent Bookings</h3>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper" style="border:none;border-radius:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Customer</th>
+                <th>Vendor</th>
+                <th>Service</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for booking in recent_bookings %}
+              <tr>
+                <td><a href="{% url 'booking_detail' booking.pk %}">{{ booking.pk }}</a></td>
+                <td>{{ booking.customer.get_full_name|default:booking.customer.username }}</td>
+                <td>{{ booking.vendor.business_name }}</td>
+                <td>{{ booking.service.name|default:"—" }}</td>
+                <td>{{ booking.scheduled_date|date:"M d" }}</td>
+                <td><span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+              </tr>
+              {% endfor %}
+              {% if not recent_bookings %}
+              <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--text-muted);">No bookings yet</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

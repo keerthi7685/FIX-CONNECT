@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Video Call — {{ vendor.business_name }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h1 style="font-size:1.6rem;"><i class="fas fa-video" style="color:var(--accent-primary);"></i> Video Consultation</h1>
+      <p style="color:var(--text-secondary);">Connect with <strong>{{ vendor.business_name }}</strong> — show your issue directly</p>
+    </div>
+
+    <div class="video-container">
+      <div class="video-box">
+        <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
+        <div id="localPlaceholder" class="video-placeholder">
+          <i class="fas fa-user"></i>
+          <p>Your Camera</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Click "Start Camera" below</p>
+        </div>
+        <div class="overlay">You</div>
+      </div>
+      <div class="video-box">
+        <div class="video-placeholder">
+          <i class="fas fa-user-tie"></i>
+          <p>{{ vendor.business_name }}</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Waiting for vendor to join...</p>
+        </div>
+        <div class="overlay">{{ vendor.user.first_name|default:vendor.business_name }}</div>
+      </div>
+    </div>
+
+    <div class="video-controls">
+      <button id="startVideoBtn" class="btn btn-primary" title="Start Camera">
+        <i class="fas fa-video"></i>
+      </button>
+      <button class="btn btn-secondary" title="Mute" onclick="this.querySelector('i').classList.toggle('fa-microphone');this.querySelector('i').classList.toggle('fa-microphone-slash');">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <button id="endVideoBtn" class="btn btn-call-end" title="End Call">
+        <i class="fas fa-phone-slash"></i>
+      </button>
+    </div>
+
+    <div class="text-center mt-4">
+      <div class="card" style="max-width:600px;margin:0 auto;">
+        <div class="card-body">
+          <h3 style="font-size:1rem;margin-bottom:8px;">
+            <i class="fas fa-info-circle" style="color:var(--accent-primary);"></i> How it works
+          </h3>
+          <p class="card-text">
+            Show the issue to the vendor through your camera. The vendor can diagnose the problem and
+            provide repair advice. Based on their assessment, you can decide whether to book an on-site service.
+          </p>
+          <div class="mt-2">
+            <a href="{% url 'booking_create' vendor.pk %}" class="btn btn-success btn-sm">
+              <i class="fas fa-calendar-plus"></i> Book On-Site Visit Instead
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // Auto-show local video when stream starts
+  const localVideo = document.getElementById('localVideo');
+  if (localVideo) {
+    localVideo.addEventListener('loadeddata', () => {
+      localVideo.style.display = 'block';
+    });
+  }
+</script>
+{% endblock %}
+{% endblock %}

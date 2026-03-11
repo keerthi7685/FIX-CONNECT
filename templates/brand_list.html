@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Service Centers{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="page-header">
+      <h1><i class="fas fa-building" style="color:var(--accent-tertiary);"></i> Brand Service Centers</h1>
+    </div>
+
+    <form method="get" class="filter-bar">
+      <input type="text" name="q" class="form-input" placeholder="Search brands or city..." value="{{ query }}">
+      <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+    </form>
+
+    {% if brands %}
+    <div class="grid grid-3">
+      {% for brand in brands %}
+      <a href="{% url 'brand_detail' brand.slug %}" class="card" style="text-decoration:none;">
+        <div class="card-body">
+          <div class="brand-logo">{{ brand.brand_name|first }}</div>
+          <h3 class="card-title">{{ brand.brand_name }}</h3>
+          <p class="card-text">{{ brand.description|truncatewords:20 }}</p>
+          <div class="vendor-meta mt-2">
+            {% if brand.phone %}
+            <span><i class="fas fa-phone"></i> {{ brand.phone }}</span>
+            {% endif %}
+            {% if brand.city %}
+            <span><i class="fas fa-map-marker-alt"></i> {{ brand.city }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-building"></i>
+      <h3>No brand centers found</h3>
+      <p>Try a different search term</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

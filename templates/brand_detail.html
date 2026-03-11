@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ brand.brand_name }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="card" style="max-width:800px;margin:0 auto;">
+      <div class="card-body">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="brand-logo" style="width:80px;height:80px;font-size:2rem;margin-bottom:0;">
+            {{ brand.brand_name|first }}
+          </div>
+          <div>
+            <h1 style="font-size:1.8rem;margin-bottom:4px;">{{ brand.brand_name }}</h1>
+            <span class="badge badge-verified"><i class="fas fa-building"></i> Official Service Center</span>
+          </div>
+        </div>
+
+        {% if brand.description %}
+        <p class="card-text mb-3">{{ brand.description }}</p>
+        {% endif %}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
+          {% if brand.phone %}
+          <div class="detail-row">
+            <span class="detail-label"><i class="fas fa-phone"></i> Phone</span>
+            <span class="detail-value">{{ brand.phone }}</span>
+          </div>
+          {% endif %}
+          {% if brand.email %}
+          <div class="detail-row">
+            <span class="detail-label"><i class="fas fa-envelope"></i> Email</span>
+            <span class="detail-value">{{ brand.email }}</span>
+          </div>
+          {% endif %}
+          {% if brand.city %}
+          <div class="detail-row">
+            <span class="detail-label"><i class="fas fa-map-marker-alt"></i> City</span>
+            <span class="detail-value">{{ brand.city }}</span>
+          </div>
+          {% endif %}
+          {% if brand.website %}
+          <div class="detail-row">
+            <span class="detail-label"><i class="fas fa-globe"></i> Website</span>
+            <span class="detail-value"><a href="{{ brand.website }}" target="_blank">Visit</a></span>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if brand.address %}
+        <div class="mt-3">
+          <h3 style="font-size:1rem;margin-bottom:8px;"><i class="fas fa-map"></i> Address</h3>
+          <p class="card-text">{{ brand.address }}</p>
+        </div>
+        {% endif %}
+
+        {% if brand.services.all %}
+        <div class="mt-3">
+          <h3 style="font-size:1rem;margin-bottom:8px;">Services</h3>
+          <div class="vendor-services">
+            {% for svc in brand.services.all %}
+            <span class="tag">{{ svc.name }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-footer">
+        <a href="{% url 'brand_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+        {% if brand.phone %}
+        <a href="tel:{{ brand.phone }}" class="btn btn-success"><i class="fas fa-phone"></i> Call Now</a>
+        {% endif %}
+        {% if brand.website %}
+        <a href="{{ brand.website }}" target="_blank" class="btn btn-primary"><i class="fas fa-globe"></i> Visit Website</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

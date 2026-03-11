@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Appliance{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="form-card">
+      <h2><i class="fas fa-{% if action == 'Add' %}plus{% else %}edit{% endif %}" style="color:var(--accent-tertiary);"></i> {{ action }} Appliance</h2>
+      <p class="subtitle">{{ action }} your home appliance details for warranty tracking</p>
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <ul class="errorlist">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="flex gap-1 mt-3">
+          <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">
+            <i class="fas fa-save"></i> Save Appliance
+          </button>
+          <a href="{% url 'appliance_list' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

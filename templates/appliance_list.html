@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appliances{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="page-header">
+      <h1><i class="fas fa-box" style="color:var(--accent-tertiary);"></i> My Appliances</h1>
+      <a href="{% url 'appliance_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Appliance
+      </a>
+    </div>
+
+    {% if appliances %}
+    <div class="grid grid-3">
+      {% for appliance in appliances %}
+      <div class="card">
+        <div class="card-body">
+          <div class="appliance-icon">
+            {% if appliance.appliance_type == 'ac' %}
+              <i class="fas fa-snowflake"></i>
+            {% elif appliance.appliance_type == 'refrigerator' %}
+              <i class="fas fa-temperature-low"></i>
+            {% elif appliance.appliance_type == 'washing_machine' %}
+              <i class="fas fa-tshirt"></i>
+            {% elif appliance.appliance_type == 'tv' %}
+              <i class="fas fa-tv"></i>
+            {% elif appliance.appliance_type == 'microwave' %}
+              <i class="fas fa-utensils"></i>
+            {% elif appliance.appliance_type == 'water_heater' %}
+              <i class="fas fa-fire"></i>
+            {% else %}
+              <i class="fas fa-cog"></i>
+            {% endif %}
+          </div>
+          <h3 class="card-title">{{ appliance.get_appliance_type_display }}</h3>
+          <p class="card-text">{{ appliance.brand }}{% if appliance.model_number %} — {{ appliance.model_number }}{% endif %}</p>
+
+          {% if appliance.warranty_end_date %}
+          <div class="mt-1">
+            {% if appliance.is_under_warranty %}
+              <span class="badge badge-warranty"><i class="fas fa-shield-alt"></i> Under Warranty (till {{ appliance.warranty_end_date|date:"M d, Y" }})</span>
+            {% else %}
+              <span class="badge badge-cancelled"><i class="fas fa-exclamation-triangle"></i> Warranty Expired</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {% if appliance.purchase_date %}
+          <div class="vendor-meta mt-1">
+            <span><i class="fas fa-calendar"></i> Purchased {{ appliance.purchase_date|date:"M d, Y" }}</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'appliance_edit' appliance.pk %}" class="btn btn-secondary btn-sm" style="flex:1;">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+          <a href="{% url 'appliance_delete' appliance.pk %}" class="btn btn-danger btn-sm">
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-box-open"></i>
+      <h3>No appliances added yet</h3>
+      <p>Track your home appliances to manage warranties and service schedules</p>
+      <a href="{% url 'appliance_create' %}" class="btn btn-primary mt-2">
+        <i class="fas fa-plus"></i> Add First Appliance
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

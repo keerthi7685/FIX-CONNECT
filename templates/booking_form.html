@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ vendor.business_name }}{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="container">
+    <div class="form-card" style="max-width:640px;">
+      <h2><i class="fas fa-calendar-plus" style="color:var(--accent-success);"></i> Book Service</h2>
+      <p class="subtitle">Schedule a service with <strong>{{ vendor.business_name }}</strong></p>
+
+      <div class="flex items-center gap-2 mb-3" style="padding:16px;background:var(--bg-glass);border-radius:var(--radius-md);border:1px solid var(--border-color);">
+        <div class="vendor-avatar" style="margin-bottom:0;width:48px;height:48px;font-size:1.2rem;">
+          {{ vendor.user.first_name|first|default:"V" }}
+        </div>
+        <div>
+          <strong>{{ vendor.business_name }}</strong>
+          <div style="color:var(--text-muted);font-size:0.85rem;">
+            {{ vendor.user.city|default:"" }} · ₹{{ vendor.hourly_rate }}/hr · {{ vendor.average_rating }}★
+          </div>
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <ul class="errorlist">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="flex gap-1 mt-3">
+          <button type="submit" class="btn btn-success btn-lg" style="flex:1;">
+            <i class="fas fa-check"></i> Confirm Booking
+          </button>
+          <a href="{% url 'vendor_detail' vendor.pk %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

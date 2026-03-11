@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <span class="section-badge">🏠 Smart Home Services</span>
+      <h1>Find & Book <span class="highlight">Trusted Home</span> Service Professionals</h1>
+      <p>Discover nearby technicians, consult experts via video, and book reliable home maintenance services — all in one platform.</p>
+      <div class="hero-actions">
+        <a href="{% url 'vendor_list' %}" class="btn btn-primary btn-lg">
+          <i class="fas fa-search"></i> Find a Vendor
+        </a>
+        <a href="{% url 'service_list' %}" class="btn btn-secondary btn-lg">
+          <i class="fas fa-th-large"></i> Browse Services
+        </a>
+      </div>
+      <form action="{% url 'vendor_list' %}" method="get" class="search-bar">
+        <input type="text" name="q" placeholder="Search for plumber, electrician, AC repair...">
+        <button type="submit"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-badge">How It Works</span>
+      <h2>Get Your Home Fixed in 4 Simple Steps</h2>
+      <p>Our streamlined process makes home maintenance effortless</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Search Service</h3>
+        <p>Browse categories or search for the service you need</p>
+      </div>
+      <div class="step">
+        <h3>Choose Expert</h3>
+        <p>Compare vendors by ratings, experience, and distance</p>
+      </div>
+      <div class="step">
+        <h3>Consult or Book</h3>
+        <p>Start a video call for advice or book a visit directly</p>
+      </div>
+      <div class="step">
+        <h3>Get It Done</h3>
+        <p>Receive quality service and leave a review</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
